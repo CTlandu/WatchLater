@@ -1,6 +1,29 @@
 const express = require('express');
 const router = express.Router();
 const { Following } = require('./initDB');
+const { getChannelId, getChannelInfo } = require('./youtubeService');
+
+
+// 获取YouTube频道信息
+router.get('/api/youtube-info', async (req, res) => {
+  const username = req.query.username;
+  if (!username) {
+    return res.status(400).json({ error: "Username is required" });
+  }
+
+  const channelId = await getChannelId(username);
+  if (!channelId) {
+    return res.status(404).json({ error: "Channel not found" });
+  }
+
+  const channelInfo = await getChannelInfo(channelId);
+  if (!channelInfo) {
+    return res.status(500).json({ error: "Failed to fetch channel info" });
+  }
+
+  res.json(channelInfo);
+});
+
 
 // 创建新的Following记录
 router.post('/api/following', async (req, res) => {

@@ -1,11 +1,13 @@
    # 依赖
-   /node_modules
+   /client/node_modules
+   /server/node_modules
 
    # 构建输出
    /dist
 
    # 环境变量
    .env
+   .venv
 
    # 日志
    npm-debug.log*
