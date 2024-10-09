@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import FollowingForm from "./FollowingForm";
 import FollowingTable from "./FollowingTable";
-
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const Home = () => {
-  const [platform, setPlatform] = useState("Bilibili");
+  const [platform, setPlatform] = useState("YouTube");
   const [username, setUsername] = useState("");
   const [followings, setFollowings] = useState([]);
   const [editingId, setEditingId] = useState(null);
@@ -66,13 +65,13 @@ const Home = () => {
     }
   };
 
-  if (isLoading) return <div>加载中...</div>;
-  if (error) return <div>错误: {error}</div>;
+  if (isLoading) return <div className="text-black">加载中...</div>;
+  if (error) return <div className="text-red-500">错误: {error}</div>;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">关注管理</h1>
+    <div className="flex flex-col min-h-screen w-full bg-gray-100 text-black">
+      <div className="flex-grow container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">关注管理</h1>
 
         <FollowingForm
           platform={platform}

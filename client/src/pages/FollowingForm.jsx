@@ -16,8 +16,8 @@ const FollowingForm = ({
           onChange={(e) => onPlatformChange(e.target.value)}
           className="block w-1/3 bg-white border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
         >
+          <option>YouTube</option>
           <option>Bilibili</option>
-          <option>Youtube</option>
           <option>Reels</option>
           <option>Tiktok</option>
         </select>

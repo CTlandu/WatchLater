@@ -18,7 +18,7 @@ const connectDB = async () => {
 const followingSchema = new mongoose.Schema({
   platform: {
     type: String,
-    enum: ['Bilibili', 'Youtube', 'Tiktok', 'Reels'],
+    enum: ['Bilibili', 'YouTube', 'Tiktok', 'Reels'],
     required: true
   },
   username: {

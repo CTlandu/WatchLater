@@ -1,51 +1,52 @@
 const express = require('express');
 const router = express.Router();
 const { Following } = require('./initDB');
-const { getChannelId, getChannelInfo } = require('./youtubeService');
+const { getChannelDetailsByNickname } = require('./youtubeService');
 
-
-// 获取YouTube频道信息
 router.get('/api/youtube-info', async (req, res) => {
-  const username = req.query.username;
-  if (!username) {
-    return res.status(400).json({ error: "Username is required" });
+  const { nickname } = req.query;
+
+  if (!nickname) {
+    return res.status(400).json({ error: "需要提供 nickname 参数" });
   }
 
-  const channelId = await getChannelId(username);
-  if (!channelId) {
-    return res.status(404).json({ error: "Channel not found" });
+  try {
+    const channelInfo = await getChannelDetailsByNickname(nickname);
+    res.json(channelInfo);
+  } catch (error) {
+    console.error('获取YouTube信息时出错:', error);
+    if (error.message === '频道未找到' || error.message === '无法获取频道详情') {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(500).json({ error: "获取频道信息失败", details: error.message });
   }
-
-  const channelInfo = await getChannelInfo(channelId);
-  if (!channelInfo) {
-    return res.status(500).json({ error: "Failed to fetch channel info" });
-  }
-
-  res.json(channelInfo);
 });
 
+module.exports = router;
+
+
+// 创建新的Following记录
+// 获取所有关注
+router.get('/api/following', async (req, res) => {
+  try {
+    const followings = await Following.find();
+    res.json(followings);
+  } catch (error) {
+    console.error('Error in /following route:', error);
+    res.status(500).json({ error: '获取关注列表失败' });
+  }
+});
 
 // 创建新的Following记录
 router.post('/api/following', async (req, res) => {
   try {
     const { platform, username } = req.body;
     const newFollowing = new Following({ platform, username });
-    const savedFollowing = await newFollowing.save();
-    res.status(201).json(savedFollowing);
+    await newFollowing.save();
+    res.status(201).json(newFollowing);
   } catch (error) {
+    console.error('Error creating new following:', error);
     res.status(400).json({ message: error.message });
-  }
-});
-
-// 获取所有Following记录
-router.get('/api/following', async (req, res) => {
-  try {
-    const followings = await Following.find();
-    console.log('后端查询结果:', followings); // 添加这行来调试
-    res.json(followings);
-  } catch (error) {
-    console.error('后端错误:', error); // 添加这行来调试
-    res.status(500).json({ message: error.message });
   }
 });
 
