@@ -6,7 +6,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const Home = () => {
   const [platform, setPlatform] = useState("YouTube");
-  const [username, setUsername] = useState("");
+  const [channelId, setchannelId] = useState("");
   const [followings, setFollowings] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,13 +35,13 @@ const Home = () => {
       if (editingId) {
         await axios.put(`${API_BASE_URL}/following/${editingId}`, {
           platform,
-          username,
+          channelId,
         });
         setEditingId(null);
       } else {
-        await axios.post(`${API_BASE_URL}/following`, { platform, username });
+        await axios.post(`${API_BASE_URL}/following`, { platform, channelId });
       }
-      setUsername("");
+      setchannelId("");
       fetchFollowings();
     } catch (error) {
       console.error("提交失败:", error);
@@ -51,7 +51,7 @@ const Home = () => {
 
   const handleEdit = (following) => {
     setPlatform(following.platform);
-    setUsername(following.username);
+    setchannelId(following.channelId);
     setEditingId(following._id);
   };
 
@@ -75,10 +75,10 @@ const Home = () => {
 
         <FollowingForm
           platform={platform}
-          username={username}
+          channelId={channelId}
           editingId={editingId}
           onPlatformChange={setPlatform}
-          onUsernameChange={setUsername}
+          onChannelIdChange={setchannelId}
           onSubmit={handleSubmit}
         />
 

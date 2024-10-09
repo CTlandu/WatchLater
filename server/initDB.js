@@ -21,7 +21,7 @@ const followingSchema = new mongoose.Schema({
     enum: ['Bilibili', 'YouTube', 'Tiktok', 'Reels'],
     required: true
   },
-  username: {
+  channelId: {
     type: String,
     required: true
   },

@@ -2,10 +2,10 @@ import React from "react";
 
 const FollowingForm = ({
   platform,
-  username,
+  channelId,
   editingId,
   onPlatformChange,
-  onUsernameChange,
+  onChannelIdChange,
   onSubmit,
 }) => {
   return (
@@ -23,8 +23,8 @@ const FollowingForm = ({
         </select>
         <input
           type="text"
-          value={username}
-          onChange={(e) => onUsernameChange(e.target.value)}
+          value={channelId}
+          onChange={(e) => onChannelIdChange(e.target.value)}
           className="block w-1/2 bg-white border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           placeholder="请输入用户名..."
         />

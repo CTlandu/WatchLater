@@ -1,33 +1,51 @@
 const express = require('express');
 const router = express.Router();
 const { Following } = require('./initDB');
-const { getChannelDetailsByNickname } = require('./youtubeService');
+const { getChannelsDetailsByIds, cache } = require('./youtubeService');
 
-router.get('/api/youtube-info', async (req, res) => {
-  const { nickname } = req.query;
+router.get('/debug/cache', (req, res) => {
+  const cacheKeys = cache.keys();
+  const cacheContent = {};
+  for (const key of cacheKeys) {
+    cacheContent[key] = cache.get(key);
+  }
+  res.json({
+    stats: cache.getStats(),
+    content: cacheContent,
+  });
+});
 
-  if (!nickname) {
-    return res.status(400).json({ error: "需要提供 nickname 参数" });
+router.get('/youtube-info', async (req, res) => {
+  console.log('Received request for YouTube info');
+  console.log('Query parameters:', req.query);
+
+  const { channelIds } = req.query;
+
+  if (!channelIds) {
+    console.log('No channelIds provided');
+    return res.status(400).json({ error: '需要提供 channelIds 参数' });
+  }
+
+  const channelIdArray = channelIds.split(',').filter((id) => id.trim().length > 0);
+  console.log('Channel IDs:', channelIdArray);
+
+  if (channelIdArray.length === 0) {
+    return res.status(400).json({ error: '提供的 channelIds 无效' });
   }
 
   try {
-    const channelInfo = await getChannelDetailsByNickname(nickname);
-    res.json(channelInfo);
+    const channelsInfo = await getChannelsDetailsByIds(channelIdArray);
+    console.log('Channel info retrieved successfully');
+    res.json(channelsInfo);
   } catch (error) {
     console.error('获取YouTube信息时出错:', error);
-    if (error.message === '频道未找到' || error.message === '无法获取频道详情') {
-      return res.status(404).json({ error: error.message });
-    }
-    res.status(500).json({ error: "获取频道信息失败", details: error.message });
+    res.status(500).json({ error: '获取频道信息失败', details: error.message });
   }
 });
 
-module.exports = router;
-
-
 // 创建新的Following记录
 // 获取所有关注
-router.get('/api/following', async (req, res) => {
+router.get('/following', async (req, res) => {
   try {
     const followings = await Following.find();
     res.json(followings);
@@ -38,10 +56,10 @@ router.get('/api/following', async (req, res) => {
 });
 
 // 创建新的Following记录
-router.post('/api/following', async (req, res) => {
+router.post('/following', async (req, res) => {
   try {
-    const { platform, username } = req.body;
-    const newFollowing = new Following({ platform, username });
+    const { platform, channelId } = req.body;
+    const newFollowing = new Following({ platform, channelId });
     await newFollowing.save();
     res.status(201).json(newFollowing);
   } catch (error) {
@@ -51,7 +69,7 @@ router.post('/api/following', async (req, res) => {
 });
 
 // 获取特定的Following记录
-router.get('/api/following/:id', async (req, res) => {
+router.get('/following/:id', async (req, res) => {
   try {
     const following = await Following.findById(req.params.id);
     if (!following) return res.status(404).json({ message: '未找到记录' });
@@ -62,12 +80,12 @@ router.get('/api/following/:id', async (req, res) => {
 });
 
 // 更新Following记录
-router.put('/api/following/:id', async (req, res) => {
+router.put('/following/:id', async (req, res) => {
   try {
-    const { platform, username } = req.body;
+    const { platform, channelId } = req.body;
     const updatedFollowing = await Following.findByIdAndUpdate(
       req.params.id,
-      { platform, username },
+      { platform, channelId },
       { new: true }
     );
     if (!updatedFollowing) return res.status(404).json({ message: '未找到记录' });
@@ -78,7 +96,7 @@ router.put('/api/following/:id', async (req, res) => {
 });
 
 // 删除Following记录
-router.delete('/api/following/:id', async (req, res) => {
+router.delete('/following/:id', async (req, res) => {
   try {
     const deletedFollowing = await Following.findByIdAndDelete(req.params.id);
     if (!deletedFollowing) return res.status(404).json({ message: '未找到记录' });
