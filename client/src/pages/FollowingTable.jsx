@@ -4,7 +4,6 @@ import axiosRetry from 'axios-retry';
 import YouTubeInformation from './YouTubeInformation';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
-console.log('API_BASE_URL:', API_BASE_URL);
 
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
@@ -13,20 +12,12 @@ const FollowingTable = ({ followings, onEdit, onDelete }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  console.log('FollowingTable rendered with followings:', followings);
-
   const fetchYouTubeInfo = useCallback(async () => {
-    console.log('Fetching YouTube info...');
-    console.log('Current followings:', followings);
-
     const youtubers = followings
       .filter((f) => f.platform === 'YouTube' && f.channelId)
       .map((f) => f.channelId);
 
-    console.log('YouTube channel IDs:', youtubers);
-
     if (youtubers.length === 0) {
-      console.log('No YouTube followings found');
       setYoutubeInfo({});
       return;
     }
@@ -37,11 +28,8 @@ const FollowingTable = ({ followings, onEdit, onDelete }) => {
     try {
       const channelIdsParam = youtubers.join(',');
       const url = `${API_BASE_URL}/youtube-info?channelIds=${channelIdsParam}`;
-      console.log('Fetching YouTube info from URL:', url);
       const response = await axios.get(url, { timeout: 10000 });
-      console.log('Raw YouTube info received:', response.data);
       setYoutubeInfo(response.data);
-      console.log('YouTube info set in state:', response.data);
     } catch (err) {
       console.error('获取YouTube信息失败:', err);
       setError(err.response?.data?.error || '获取YouTube信息失败');
@@ -56,45 +44,49 @@ const FollowingTable = ({ followings, onEdit, onDelete }) => {
     }
   }, [followings, fetchYouTubeInfo]);
 
-  console.log('Current youtubeInfo state before rendering:', youtubeInfo);
-
   if (followings.length === 0) {
-    return <p className="text-center py-4">暂无数据</p>;
+    return <p className="text-center py-4 text-gray-500">暂无订阅数据</p>;
   }
 
   return (
     <div className="space-y-6">
       <button
         onClick={fetchYouTubeInfo}
-        className="mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        className="mb-4 bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded text-sm"
         disabled={loading}
       >
         {loading ? '刷新中...' : '刷新YouTube信息'}
       </button>
 
-      <table className="min-w-full bg-white border border-gray-300">
-        <thead>
+      <table className="min-w-full bg-white">
+        <thead className="bg-gray-100">
           <tr>
-            <th className="py-2 px-4 border-b">平台</th>
-            <th className="py-2 px-4 border-b">频道ID</th>
-            <th className="py-2 px-4 border-b">操作</th>
+            <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              平台
+            </th>
+            <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              频道ID
+            </th>
+            <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              操作
+            </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-200">
           {followings.map((following) => (
             <tr key={following._id}>
-              <td className="py-2 px-4 border-b">{following.platform}</td>
-              <td className="py-2 px-4 border-b">{following.channelId}</td>
-              <td className="py-2 px-4 border-b">
+              <td className="py-2 px-4 text-sm">{following.platform}</td>
+              <td className="py-2 px-4 text-sm">{following.channelId}</td>
+              <td className="py-2 px-4 text-sm">
                 <button
                   onClick={() => onEdit(following)}
-                  className="mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                  className="mr-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded text-xs"
                 >
                   编辑
                 </button>
                 <button
                   onClick={() => onDelete(following._id)}
-                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded text-xs"
                 >
                   删除
                 </button>
@@ -104,7 +96,7 @@ const FollowingTable = ({ followings, onEdit, onDelete }) => {
         </tbody>
       </table>
 
-      {loading && <div className="text-center py-4">加载YouTube信息中...</div>}
+      {loading && <div className="text-center py-4 text-gray-500">加载YouTube信息中...</div>}
       {error && <div className="text-center py-4 text-red-500">{error}</div>}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -112,7 +104,6 @@ const FollowingTable = ({ followings, onEdit, onDelete }) => {
           .filter((following) => following.platform === 'YouTube')
           .map((following) => {
             const channelInfo = youtubeInfo[following.channelId];
-            console.log('ChannelID:::::', following.channelId);
             return (
               <YouTubeInformation
                 key={following._id}
