@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const FollowingForm = ({
   platform,
@@ -21,6 +21,7 @@ const FollowingForm = ({
           <option>Reels</option>
           <option>Tiktok</option>
         </select>
+        <div className="mr-0">@</div>
         <input
           type="text"
           value={channelId}
@@ -32,7 +33,7 @@ const FollowingForm = ({
           type="submit"
           className="w-1/6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         >
-          {editingId ? "更新" : "添加"}
+          {editingId ? '更新' : '添加'}
         </button>
       </div>
     </form>

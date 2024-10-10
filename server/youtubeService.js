@@ -75,7 +75,7 @@ async function getChannelsDetailsByIds(channelIds) {
       order: 'date',
       type: 'video',
       publishedAfter: oneDayAgo,
-      maxResults: 50, // 增加获取的视频数量，以确保我们能获取到所有24小时内的视频
+      maxResults: 3, // 增加获取的视频数量，以确保我们能获取到所有24小时内的视频
       fields: 'items(id(videoId),snippet(title,thumbnails/medium,publishedAt,channelId))',
     });
 

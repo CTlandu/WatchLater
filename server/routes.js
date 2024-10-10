@@ -2,7 +2,22 @@ const express = require('express');
 const router = express.Router();
 const { Following } = require('./initDB');
 const { getChannelsDetailsByIds, cache } = require('./youtubeService');
+const { scrapeInstagramProfile } = require('./instagramScraper');
 
+// 新增 Instagram 路由
+router.get('/instagram/:username', async (req, res) => {
+  try {
+    const username = req.params.username;
+    console.log('获取Instagram用户数据:', username);
+    const profileData = await scrapeInstagramProfile(username);
+    res.json(profileData);
+  } catch (error) {
+    console.error('获取Instagram数据时出错:', error);
+    res.status(500).json({ error: '获取Instagram数据失败', details: error.message });
+  }
+});
+
+// 调试缓存
 router.get('/debug/cache', (req, res) => {
   const cacheKeys = cache.keys();
   const cacheContent = {};
@@ -15,6 +30,7 @@ router.get('/debug/cache', (req, res) => {
   });
 });
 
+// 获取YouTube信息
 router.get('/youtube-info', async (req, res) => {
   console.log('Received request for YouTube info');
   console.log('Query parameters:', req.query);
@@ -43,7 +59,6 @@ router.get('/youtube-info', async (req, res) => {
   }
 });
 
-// 创建新的Following记录
 // 获取所有关注
 router.get('/following', async (req, res) => {
   try {
