@@ -34,22 +34,27 @@ const FollowingTable = ({ followings, onDelete, youtubeInfo, isLoading, error })
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {followings.map((following) => (
-            <tr key={following._id}>
-              <td className="py-2 px-4 text-sm">{following.platform}</td>
-              <td className="py-2 px-4 text-sm">{following.channel_username}</td>
-              <td className="py-2 px-4 text-sm">{following.channel_index_id}</td>
-              <td className="py-2 px-4 text-sm">{following.channel_title}</td>
-              <td className="py-2 px-4 text-sm">
-                <button
-                  onClick={() => onDelete(following._id)}
-                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded text-xs"
-                >
-                  删除
-                </button>
-              </td>
-            </tr>
-          ))}
+          {followings.map((following) => {
+            const channelInfo = youtubeInfo[following.channel_index_id];
+            return (
+              <tr key={following._id}>
+                <td className="py-2 px-4 text-sm">{following.platform}</td>
+                <td className="py-2 px-4 text-sm">
+                  {channelInfo ? channelInfo.channel_username : following.channel_username}
+                </td>
+                <td className="py-2 px-4 text-sm">{following.channel_index_id}</td>
+                <td className="py-2 px-4 text-sm">{following.channel_title}</td>
+                <td className="py-2 px-4 text-sm">
+                  <button
+                    onClick={() => onDelete(following._id)}
+                    className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded text-xs"
+                  >
+                    删除
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
 

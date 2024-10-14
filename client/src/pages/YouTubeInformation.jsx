@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const formatNumber = (num) => {
   if (num >= 1000000) {
@@ -26,22 +26,24 @@ const VideoItem = ({ video }) => (
 );
 
 const YouTubeInformation = ({ channelInfo }) => {
+  const [imgError, setImgError] = useState(false);
+
   if (!channelInfo) {
     return <div className="text-center py-4">加载中...</div>;
   }
 
   const { channel_title, avatar, subscribers, video_count, recent_videos } = channelInfo;
 
-  // 只显示最多3个视频
   const displayVideos = recent_videos && recent_videos.slice(0, 3);
 
   return (
     <div className="youtube-info bg-white shadow-lg rounded-lg overflow-hidden">
       <div className="channel-header p-4 flex items-center border-b">
         <img
-          src={avatar}
+          src={imgError ? '/path/to/default-avatar.png' : avatar}
           alt={channel_title}
           className="channel-avatar w-16 h-16 rounded-full mr-4"
+          onError={() => setImgError(true)}
         />
         <div>
           <h3 className="text-xl font-bold">{channel_title}</h3>

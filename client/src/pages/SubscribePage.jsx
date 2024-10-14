@@ -9,7 +9,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const SubscribePage = () => {
   const [userId, setUserId] = useState(null);
-  const [userEmail, setUserEmail] = useState('');
+  const [userEmail, setUserEmail] = useState('test@wm.edu');
   const [platform, setPlatform] = useState('YouTube');
   const [channelId, setChannelId] = useState('');
   const [followings, setFollowings] = useState([]);
@@ -90,7 +90,7 @@ const SubscribePage = () => {
   const handleDelete = async (followingId) => {
     try {
       await axios.delete(`${API_BASE_URL}/following/${userId}/${followingId}`);
-      fetchFollowings();
+      setFollowings((prevFollowings) => prevFollowings.filter((f) => f._id !== followingId));
     } catch (error) {
       setError('删除失败: ' + error.message);
     }

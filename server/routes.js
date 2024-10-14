@@ -59,14 +59,7 @@ router.post('/following/:userId', async (req, res) => {
       return res.status(404).json({ message: '无法获取YouTube频道详情' });
     }
 
-    let youtubeUser = await YouTubeUser.findOneAndUpdate(
-      { channel_index_id: channelIndexId },
-      {
-        ...channelDetails[channelIndexId],
-        channel_username: channelId,
-      },
-      { upsert: true, new: true }
-    );
+    const youtubeUser = channelDetails[channelIndexId];
 
     user.user_following.push({
       platform,
@@ -81,6 +74,7 @@ router.post('/following/:userId', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
+
 // 删除关注
 router.delete('/following/:userId/:followingId', async (req, res) => {
   try {
